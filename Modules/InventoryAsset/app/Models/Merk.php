@@ -1,26 +1,19 @@
 <?php
 
-namespace Modules\InventoryAsset\Models;
+namespace Modules\InventoryAsset\app\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-// use Modules\InventoryAsset\Database\Factories\MerkFactory;
 
-class merk extends Model
+class Merk extends Model
 {
     use HasFactory;
-    protected $table = 'merk';
 
-    /**
-     * The attributes that are mass assignable.
-     */
+    protected $table = 'merk_barang';
+
     protected $fillable = [
-    'kode_merk',
-    'nama_merk',
-    'keterangan',
+        'kode_merk',
+        'nama_merk',
+        'keterangan',
     ];
-    // protected static function newFactory(): MerkFactory
-    // {
-    //     // return MerkFactory::new();
-    // }
 }

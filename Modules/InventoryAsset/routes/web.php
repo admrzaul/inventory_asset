@@ -1,11 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\InventoryAsset\Http\Controllers\InventoryAssetController;
+use Modules\InventoryAsset\app\Http\Controllers\InventoryAssetController;
+use Modules\InventoryAsset\app\Http\Controllers\MerkController;
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::resource('inventoryassets', InventoryAssetController::class)->names('inventoryasset');
-});
+Route::resource('inventoryassets', InventoryAssetController::class)->names('inventoryasset');
 
-Route::get('/contoh', [merkController::class, 'index'])
-    ->name('contoh.index');
+Route::resource('merk', MerkController::class)
+    ->only(['index', 'store', 'update', 'destroy']);

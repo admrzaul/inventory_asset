@@ -1,67 +1,84 @@
 <?php
 
-namespace Modules\InventoryAsset\Http\Controllers;
+namespace Modules\InventoryAsset\app\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Modules\InventoryAsset\app\Models\Merk;
 
 class MerkController extends Controller
 {
+    /**
+     * Menampilkan data merk + fitur cari
+     */
     public function index(Request $request)
     {
-        return view('inventoryasset::index');
-    
-        $filter = $request->input('cari');
+        $cari = $request->cari;
 
-        $model = merk::query();
+        $merks = Merk::when($cari, function ($query) use ($cari) {
+                        $query->where('kode_merk', 'like', "%{$cari}%")
+                              ->orWhere('nama_merk', 'like', "%{$cari}%")
+                              ->orWhere('keterangan', 'like', "%{$cari}%");
+                    })
+                    ->orderBy('id', 'desc')
+                    ->paginate(10);
 
-        if ($filter) {
-            $merk->where(function ($query) use ($merk) {
-                $query->where('nama','like','%'.$merk. '%')
-                ->orWhere('deskripsi','like','%'.$merk. '%');
-            });
-
-        }
-        $filter = $filter->latest()->paginate(10);
-
-        return view('inventoryasset::lokasi.index', compact('filter','merk'));
-}
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('inventoryasset::create');
+        return view('inventoryasset::merk.index', compact('merks', 'cari'));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Simpan data merk
      */
-    public function store(Request $request) {}
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
+    public function store(Request $request)
     {
-        return view('inventoryasset::show');
+        $request->validate([
+            'kode_merk' => 'required|unique:merk_barang,kode_merk',
+            'nama_merk' => 'required',
+        ]);
+
+        Merk::create([
+            'kode_merk' => $request->kode_merk,
+            'nama_merk' => $request->nama_merk,
+            'keterangan' => $request->keterangan,
+        ]);
+
+        return redirect()
+            ->route('merk.index')
+            ->with('success', 'Data merk berhasil ditambahkan');
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Update data merk
      */
-    public function edit($id)
+    public function update(Request $request, $id)
     {
-        return view('inventoryasset::edit');
+        $request->validate([
+            'kode_merk' => 'required|unique:merk_barang,kode_merk,' . $id,
+            'nama_merk' => 'required',
+        ]);
+
+        $merk = Merk::findOrFail($id);
+
+        $merk->update([
+            'kode_merk' => $request->kode_merk,
+            'nama_merk' => $request->nama_merk,
+            'keterangan' => $request->keterangan,
+        ]);
+
+        return redirect()
+            ->route('merk.index')
+            ->with('success', 'Data merk berhasil diperbarui');
     }
 
     /**
-     * Update the specified resource in storage.
+     * Hapus data merk
      */
-    public function update(Request $request, $id) {}
+    public function destroy($id)
+    {
+        Merk::findOrFail($id)->delete();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id) {}
+        return redirect()
+            ->route('merk.index')
+            ->with('success', 'Data merk berhasil dihapus');
+    }
 }
